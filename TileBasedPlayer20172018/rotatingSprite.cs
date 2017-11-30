@@ -109,7 +109,7 @@ namespace AnimatedSprite
         public override void Update(GameTime gametime)
         {
             if(Hbar != null)
-               {
+            {
                 Hbar.health = Health;
                 Hbar.position = PixelPosition - new Vector2(10, 20);
             }

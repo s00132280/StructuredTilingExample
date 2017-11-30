@@ -36,25 +36,25 @@ namespace Tiler
         public override void Update(GameTime gameTime)
         {
             previousPosition = PixelPosition;
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            if (Keyboard.GetState().IsKeyDown(Keys.D) || Keyboard.GetState().IsKeyDown(Keys.Right))
             {
                 this.PixelPosition += new Vector2(1, 0) * speed;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            if (Keyboard.GetState().IsKeyDown(Keys.A) || Keyboard.GetState().IsKeyDown(Keys.Left))
             {
                 this.PixelPosition += new Vector2(-1, 0) * speed;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            if (Keyboard.GetState().IsKeyDown(Keys.W) || Keyboard.GetState().IsKeyDown(Keys.Up))
             {
                 this.PixelPosition += new Vector2(0, -1) * speed;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.S))
+            if (Keyboard.GetState().IsKeyDown(Keys.S) || Keyboard.GetState().IsKeyDown(Keys.Down))
             {
                 this.PixelPosition += new Vector2(0, 1) * speed;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Z))
+            if (Keyboard.GetState().IsKeyDown(Keys.Z) || Keyboard.GetState().IsKeyDown(Keys.Q))
                 this.angleOfRotation -= turnspeed;
-            if (Keyboard.GetState().IsKeyDown(Keys.X))
+            if (Keyboard.GetState().IsKeyDown(Keys.X) || Keyboard.GetState().IsKeyDown(Keys.E))
                 this.angleOfRotation += turnspeed;
 
             base.Update(gameTime);
