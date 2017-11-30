@@ -108,19 +108,18 @@ namespace TileBasedPlayer20172018
             List<Tile> found = SimpleTileLayer.getNamedTiles(backTileNames[(int)TileType.GREENBOX]);
             //List<Tile> found = SimpleTileLayer.getNamedTiles("green box");
             // added a senytry gameservice similer to a player. 29/11/17 at 13:44
-            // i guessed that the sentry will behave similer but it will rotate towards the player
             for (int i = 0; i < found.Count; i++)
             {
-                sentry = new sentrys((new TilePlayer(this, new Vector2(found[i].X * tileWidth,found[i].Y * tileHeight), new List<TileRef>()
+                sentrys = new Sentry(this,new Vector2(found[i].X * tileWidth,found[i].Y * tileHeight), new List<TileRef>()
             {
-                new TileRef(15, 2, 0),
-                new TileRef(15, 3, 0),
-                new TileRef(15, 4, 0),
-                new TileRef(15, 5, 0),
-                new TileRef(15, 6, 0),
-                new TileRef(15, 7, 0),
-                new TileRef(15, 8, 0),
-            }, 64, 64, 0f));
+                new TileRef(21, 2, 0),
+                new TileRef(21, 3, 0),
+                new TileRef(21, 4, 0),
+                new TileRef(21, 5, 0),
+                new TileRef(21, 6, 0),
+                new TileRef(21, 7, 0),
+                new TileRef(21, 8, 0),
+            }, 64, 64, 0f);
             }
             // this one uses the enum for the same task.
             
