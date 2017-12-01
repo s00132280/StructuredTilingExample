@@ -19,7 +19,7 @@ namespace TileBasedPlayer20172018
         Sentry sentrys;
         int tileWidth = 64;
         int tileHeight = 64;
-        Sentry sentry;
+        
         List<TileRef> TileRefs = new List<TileRef>();
         List<Collider> colliders = new List<Collider>();
         string[] backTileNames = { "blue box", "pavement", "blue steel", "green box", "home" };
@@ -64,7 +64,7 @@ namespace TileBasedPlayer20172018
             new Camera(this, Vector2.Zero,
                 new Vector2(tileMap.GetLength(1) * tileWidth, tileMap.GetLength(0) * tileHeight));
             new InputEngine(this);
-            Services.AddService(new TilePlayer(this, new Vector2(64, 128), new List<TileRef>()
+             Services.AddService(new TilePlayer(this, new Vector2(64, 128), new List<TileRef>()
             {
                 new TileRef(15, 2, 0),
                 new TileRef(15, 3, 0),
@@ -158,7 +158,7 @@ namespace TileBasedPlayer20172018
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
+            
             // TODO: Add your update logic here
 
             base.Update(gameTime);

@@ -17,7 +17,6 @@ namespace TileBasedPlayer20172018
     {
         //List<TileRef> images = new List<TileRef>() { new TileRef(15, 2, 0)};
         //TileRef currentFrame;
-        int speed = 5;
         float turnspeed = 0.03f;
         public Vector2 previousPosition;
 
