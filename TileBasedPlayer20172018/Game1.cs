@@ -19,7 +19,9 @@ namespace TileBasedPlayer20172018
         Sentry sentrys;
         int tileWidth = 64;
         int tileHeight = 64;
-        
+
+
+        List<Sentry> sentryList = new List<Sentry>();
         List<TileRef> TileRefs = new List<TileRef>();
         List<Collider> colliders = new List<Collider>();
         string[] backTileNames = { "blue box", "pavement", "blue steel", "green box", "home" };
@@ -46,6 +48,9 @@ namespace TileBasedPlayer20172018
         {2,2,3,2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
         {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
     };
+
+        public TilePlayer player { get; set; }
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -80,6 +85,7 @@ namespace TileBasedPlayer20172018
             SetColliders(TileType.BLUESTEEL);
             SetColliders(TileType.BLUEBOX);
 
+            player = (TilePlayer)Services.GetService(typeof(TilePlayer));
             base.Initialize();
         }
 
@@ -106,20 +112,22 @@ namespace TileBasedPlayer20172018
 
             new SimpleTileLayer(this, backTileNames, tileMap, TileRefs, tileWidth, tileHeight);
             List<Tile> found = SimpleTileLayer.getNamedTiles(backTileNames[(int)TileType.GREENBOX]);
+            
             //List<Tile> found = SimpleTileLayer.getNamedTiles("green box");
             // added a senytry gameservice similer to a player. 29/11/17 at 13:44
             for (int i = 0; i < found.Count; i++)
             {
                 sentrys = new Sentry(this,new Vector2(found[i].X * tileWidth,found[i].Y * tileHeight), new List<TileRef>()
             {
-                new TileRef(21, 2, 0),
-                new TileRef(21, 3, 0),
-                new TileRef(21, 4, 0),
-                new TileRef(21, 5, 0),
-                new TileRef(21, 6, 0),
-                new TileRef(21, 7, 0),
-                new TileRef(21, 8, 0),
+                new TileRef(20, 2, 0),
+                new TileRef(20, 3, 0),
+                new TileRef(20, 4, 0),
+                new TileRef(20, 5, 0),
+                new TileRef(20, 6, 0),
+                new TileRef(20, 7, 0),
+                new TileRef(20, 8, 0),
             }, 64, 64, 0f);
+                sentryList.Add(sentrys);
             }
             // this one uses the enum for the same task.
             
@@ -140,26 +148,21 @@ namespace TileBasedPlayer20172018
 
                 }
         }
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
+
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            for (int i = 0; i < sentryList.Count; i++)
+            {
+                sentryList[i].follow(player);
+            }
             
-            // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
