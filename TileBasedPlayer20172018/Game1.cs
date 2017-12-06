@@ -50,6 +50,7 @@ namespace TileBasedPlayer20172018
     };
 
         public TilePlayer player { get; set; }
+        Projectile bullet;
 
         public Game1()
         {
@@ -80,12 +81,24 @@ namespace TileBasedPlayer20172018
                 new TileRef(15, 8, 0),
             }, 64, 64, 0f));
 
+            player = (TilePlayer)Services.GetService(typeof(TilePlayer));
+
+            Services.AddService(new Projectile(this, new Vector2(64, 128), new List<TileRef>()
+            {
+                new TileRef(7,0,0),
+                new TileRef(8,0,0),
+                new TileRef(0,0,0),
+                new TileRef(1,0,0),
+                new TileRef(2,0,0)
+            }, 64, 64, 0f));
+
+            bullet = (Projectile)Services.GetService(typeof(Projectile));
 
 
             SetColliders(TileType.BLUESTEEL);
             SetColliders(TileType.BLUEBOX);
 
-            player = (TilePlayer)Services.GetService(typeof(TilePlayer));
+            
             base.Initialize();
         }
 
@@ -128,7 +141,11 @@ namespace TileBasedPlayer20172018
                 new TileRef(20, 8, 0),
             }, 64, 64, 0f);
                 sentryList.Add(sentrys);
+
+                
             }
+
+            
             // this one uses the enum for the same task.
             
         }
@@ -161,7 +178,9 @@ namespace TileBasedPlayer20172018
             for (int i = 0; i < sentryList.Count; i++)
             {
                 sentryList[i].follow(player);
+
             }
+
             
 
             base.Update(gameTime);

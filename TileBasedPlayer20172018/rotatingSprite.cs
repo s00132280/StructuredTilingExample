@@ -128,11 +128,11 @@ namespace AnimatedSprite
         /// </summary>
         private static float WrapAngle(float radians)
         {
-            while (radians > -MathHelper.Pi)
+            while (radians < -MathHelper.Pi)
             {
                 radians += MathHelper.TwoPi;
             }
-            while (radians < MathHelper.Pi)
+            while (radians > MathHelper.Pi)
             {
                 radians -= MathHelper.TwoPi;
             }
