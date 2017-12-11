@@ -42,7 +42,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Bullet.cs" />
+    <Compile Include="CrossHair.cs" />
+    <Compile Include="Explosion.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Collider.cs" />
     <Compile Include="Game1.cs" />

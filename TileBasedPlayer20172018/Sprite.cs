@@ -21,6 +21,7 @@ namespace AnimatedSprite
         private float scale = 1f;
         private Vector2 _pixelPosition;
         private Rectangle boundingRectangle;
+        
 
         public bool Visible
         {

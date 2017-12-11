@@ -6,6 +6,10 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Tiler;
 using Tiling;
+using Helpers;
+using AnimatedSprite;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace TileBasedPlayer20172018
 {
@@ -14,13 +18,22 @@ namespace TileBasedPlayer20172018
     /// </summary>
     public class Game1 : Game
     {
+        SoundEffect bulletExplosion;
+        SoundEffect Shooting;
+        Song backingTrack;
+        SoundEffect gameOver;
+
+        bool musicPlaying = false;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Sentry sentrys;
         int tileWidth = 64;
         int tileHeight = 64;
+        TilePlayer player { get; set; }
+        Explosion bullet;
+        Projectile explosion;
         
-
         List<Sentry> sentryList = new List<Sentry>();
         List<TileRef> TileRefs = new List<TileRef>();
         List<Collider> colliders = new List<Collider>();
@@ -51,9 +64,7 @@ namespace TileBasedPlayer20172018
         {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
     };
 
-        public TilePlayer player { get; set; }
-        Bullet bullet;
-        Projectile explosion;
+        
 
         public Game1()
         {
@@ -85,30 +96,11 @@ namespace TileBasedPlayer20172018
             }, 64, 64, 0f));
 
             player = (TilePlayer)Services.GetService(typeof(TilePlayer));
-
-            Services.AddService(new Projectile(this, new Vector2(64, 128), new List<TileRef>()
-            {
-                new TileRef(7,0,0),
-                new TileRef(8,0,0),
-                new TileRef(0,0,0),
-                new TileRef(1,0,0),
-                new TileRef(2,0,0)
-            }, 64, 64, 0.1f));
-
-            explosion = (Projectile)Services.GetService(typeof(Projectile));
-            explosion.Visible = false;
-
-            Services.AddService(new Bullet(this,new Vector2(128,128),new List<TileRef>()
-            {
-                new TileRef(5,0,0)
-            },64,64,0.1f));
-
-            bullet = (Bullet)Services.GetService(typeof(Bullet));
+            player.AddHealthBar(new HealthBar(this, player.PixelPosition));
 
             SetColliders(TileType.BLUESTEEL);
             SetColliders(TileType.BLUEBOX);
 
-            
             base.Initialize();
         }
 
@@ -135,29 +127,68 @@ namespace TileBasedPlayer20172018
 
             new SimpleTileLayer(this, backTileNames, tileMap, TileRefs, tileWidth, tileHeight);
             List<Tile> found = SimpleTileLayer.getNamedTiles(backTileNames[(int)TileType.GREENBOX]);
+
+            Projectile playerBullet = new Projectile(this, new List<TileRef>()
+            {
+                new TileRef(5,0,0)
+            },
+            new AnimateSheetSprite(this, player.PixelPosition, new List<TileRef>()
+            {
+                new TileRef(7,0,0),
+                new TileRef(8,0,0),
+                new TileRef(0,0,0),
+                new TileRef(1,0,0),
+                new TileRef(2,0,0)
+            }, tileWidth, tileHeight, 1), player.PixelPosition, 1);
+
+
+            player.LoadProjectile(playerBullet);
+
             
             //List<Tile> found = SimpleTileLayer.getNamedTiles("green box");
             // added a senytry gameservice similer to a player. 29/11/17 at 13:44
             for (int i = 0; i < found.Count; i++)
             {
                 sentrys = new Sentry(this,new Vector2(found[i].X * tileWidth,found[i].Y * tileHeight), new List<TileRef>()
-            {
-                new TileRef(20, 2, 0),
-                new TileRef(20, 3, 0),
-                new TileRef(20, 4, 0),
-                new TileRef(20, 5, 0),
-                new TileRef(20, 6, 0),
-                new TileRef(20, 7, 0),
-                new TileRef(20, 8, 0),
-            }, 64, 64, 0.1f);
+                {
+                    new TileRef(20, 2, 0),
+                    new TileRef(20, 3, 0),
+                    new TileRef(20, 4, 0),
+                    new TileRef(20, 5, 0),
+                    new TileRef(20, 6, 0),
+                    new TileRef(20, 7, 0),
+                    new TileRef(20, 8, 0),
+                }, 64, 64, 0f);
                 sentryList.Add(sentrys);
-
                 
+                Projectile projectile = new Projectile(this, new List<TileRef>()
+                {
+                    new TileRef(0,0,0)
+                },
+                new AnimateSheetSprite(this, player.PixelPosition, new List<TileRef>()
+                {
+                    new TileRef(7,0,0),
+                    new TileRef(8,0,0),
+                    new TileRef(0,0,0),
+                    new TileRef(1,0,0),
+                    new TileRef(2,0,0)
+                }, tileWidth, tileHeight, 1), player.PixelPosition, 1);
+
+                sentryList[i].loadProjectile(projectile);
+                sentryList[i].Health = 2;
             }
 
+            player.playerCrossHair = new CrossHair(this, new List<TileRef>()
+            {
+                new TileRef(11,6,0)
+            }, player.PixelPosition, 1);
+            // insert soundEffects and songs!
+            bulletExplosion = Content.Load<SoundEffect>("SoundEffects/atari_boom");
+            Shooting = Content.Load<SoundEffect>("SoundEffects/atari_boom2");
+
+            backingTrack = Content.Load<Song>("Songs/bgm_action_1");
             
-            // this one uses the enum for the same task.
-            
+
         }
 
         public void SetColliders(TileType t)
@@ -185,13 +216,42 @@ namespace TileBasedPlayer20172018
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+
             for (int i = 0; i < sentryList.Count; i++)
             {
                 sentryList[i].follow(player);
 
+                
+                if (sentryList[i].projectile.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && sentryList[i].projectile.collisionDetect(player))
+                {
+                    if (sentryList[i].projectile.isHit)
+                    {
+                        player.Health -= 10;
+                        sentryList[i].projectile.isHit = true;
+                    }
+                }
+
+                if (player.projectile.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && player.projectile.collisionDetect(sentryList[i]))
+                {
+                    if (!player.projectile.isHit)
+                    {
+                        sentryList[i].dead();
+                        player.projectile.isHit = true;
+                    }
+                }
             }
 
-            
+            if (!musicPlaying)
+            {
+                MediaPlayer.Play(backingTrack);
+                MediaPlayer.IsRepeating = true;
+                musicPlaying = true;
+            }
+            else if (player.Health <= 0)
+            {
+                musicPlaying = false;
+            }
 
             base.Update(gameTime);
         }
@@ -203,9 +263,7 @@ namespace TileBasedPlayer20172018
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
-
+            
             base.Draw(gameTime);
         }
     }

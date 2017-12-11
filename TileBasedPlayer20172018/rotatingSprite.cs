@@ -20,6 +20,8 @@ namespace AnimatedSprite
         private Rectangle range;
         protected int tileRangeDistance = 4;
         protected float rotationSpeed = .5f;
+        public bool chasing = false;
+        
         public Rectangle Range
         {
             get
@@ -77,7 +79,14 @@ namespace AnimatedSprite
         {
             // Only rotate towards the player if he enters the field of View
             if (followed.BoundingRectangle.Intersects(Range))
+            {
                 angleOfRotation = TurnToFace(followed.PixelPosition, PixelPosition, angleOfRotation, rotationSpeed);
+                this.chasing = true;
+            }
+            else
+            {
+                this.chasing = false;
+            }
                         
         }
 

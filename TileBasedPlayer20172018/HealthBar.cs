@@ -26,7 +26,7 @@ namespace Helpers
 
         public HealthBar(Game game, Vector2 pos) : base(game)
         {
-            txHealthBar = new Texture2D(game.GraphicsDevice, 1, 1);
+            txHealthBar = new Texture2D(game.GraphicsDevice, 1,1);
             txHealthBar.SetData(new[] { Color.White });
             position = pos;
 
