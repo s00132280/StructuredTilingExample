@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Tiles\GameOver.jpg" />
     <Content Include="Content\Tiles\tank tiles 64 x 64.png" />
     <Content Include="Icon.ico" />
   </ItemGroup>

@@ -20,12 +20,13 @@ namespace TileBasedPlayer20172018
         public Projectile projectile;
         bool alive = true;
         private float previousAngle;
-
+        TilePlayer player;
+        public bool playerTargeted = false;
         public Sentry(Game game, Vector2 userPosition,
             List<TileRef> sheetRefs, int frameWidth, int frameHeight, float layerDepth) 
                 : base(game, userPosition, sheetRefs, frameWidth, frameHeight, layerDepth)
         {
-            DrawOrder = 1;
+            DrawOrder = -4;
             count++;
         }
 
@@ -40,11 +41,18 @@ namespace TileBasedPlayer20172018
         {
             projectile = p;
             projectile.DrawOrder = 2;
+            
         }
         // setting to dead for the draw call.
         public void dead()
         {
             alive = false;
+        }
+
+        public void Target(TilePlayer p)
+        {
+            player = p;
+            playerTargeted = true;
         }
 
         public override void Update(GameTime gameTime)
@@ -56,6 +64,7 @@ namespace TileBasedPlayer20172018
                 if (chasing && previousAngle == angleOfRotation)
                 {
                     previousAngle = angleOfRotation;
+                    projectile.fire(player.PixelPosition);
                 }
                 base.Update(gameTime);
             }

@@ -122,6 +122,10 @@ namespace AnimatedSprite
                 Hbar.health = Health;
                 Hbar.position = PixelPosition - new Vector2(10, 20);
             }
+            if (chasing)
+            {
+                
+            }
             base.Update(gametime);
         }
 

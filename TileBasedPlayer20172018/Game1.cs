@@ -10,6 +10,7 @@ using Helpers;
 using AnimatedSprite;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using System;
 
 namespace TileBasedPlayer20172018
 {
@@ -22,6 +23,9 @@ namespace TileBasedPlayer20172018
         SoundEffect Shooting;
         Song backingTrack;
         SoundEffect gameOver;
+        Texture2D endScreen;
+        SpriteFont sFont;
+        double gameLimit = 400;
 
         bool musicPlaying = false;
 
@@ -31,8 +35,6 @@ namespace TileBasedPlayer20172018
         int tileWidth = 64;
         int tileHeight = 64;
         TilePlayer player { get; set; }
-        Explosion bullet;
-        Projectile explosion;
         
         List<Sentry> sentryList = new List<Sentry>();
         List<TileRef> TileRefs = new List<TileRef>();
@@ -44,8 +46,8 @@ namespace TileBasedPlayer20172018
         {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
         {2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2},
         {2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2},
-        {2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,1,1,0,0,1,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,1,2},
-        {2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,3,3,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2},
+        {2,1,1,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,1,1,0,0,1,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,1,2},
+        {2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,4,1,3,3,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2},
         {2,1,1,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,1,1,0,0,1,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,1,1,2},
         {2,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,2},
         {2,1,1,0,0,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,0,0,1,1,2},
@@ -95,12 +97,14 @@ namespace TileBasedPlayer20172018
                 new TileRef(15, 8, 0),
             }, 64, 64, 0f));
 
+            
             player = (TilePlayer)Services.GetService(typeof(TilePlayer));
             player.AddHealthBar(new HealthBar(this, player.PixelPosition));
 
             SetColliders(TileType.BLUESTEEL);
             SetColliders(TileType.BLUEBOX);
 
+            endScreen = Content.Load<Texture2D>("Tiles/GameOver");
             base.Initialize();
         }
 
@@ -110,6 +114,8 @@ namespace TileBasedPlayer20172018
         /// </summary>
         protected override void LoadContent()
         {
+            sFont = Content.Load<SpriteFont>("sFont");
+
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Services.AddService(spriteBatch);
@@ -123,6 +129,7 @@ namespace TileBasedPlayer20172018
             TileRefs.Add(new TileRef(6, 3, 2));
             TileRefs.Add(new TileRef(6, 2, 3));
             TileRefs.Add(new TileRef(0, 2, 4));
+            
             // Names fo the Tiles
 
             new SimpleTileLayer(this, backTileNames, tileMap, TileRefs, tileWidth, tileHeight);
@@ -185,7 +192,6 @@ namespace TileBasedPlayer20172018
             // insert soundEffects and songs!
             bulletExplosion = Content.Load<SoundEffect>("SoundEffects/atari_boom");
             Shooting = Content.Load<SoundEffect>("SoundEffects/atari_boom2");
-
             backingTrack = Content.Load<Song>("Songs/bgm_action_1");
             
 
@@ -223,8 +229,16 @@ namespace TileBasedPlayer20172018
                 sentryList[i].follow(player);
 
                 
-                if (sentryList[i].projectile.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && sentryList[i].projectile.collisionDetect(player))
+                if (sentryList[i].projectile.ProjectileState == Projectile.PROJECTILE_STATE.STILL && sentryList[i].projectile.collisionDetect(player))
                 {
+                    if (sentryList[i].chasing == true)
+                    {
+                        sentryList[i].Target(player);
+                    }
+                    if (sentryList[i].playerTargeted)
+                    {
+                        sentryList[i].projectile.fire(player.PixelPosition);
+                    }
                     if (sentryList[i].projectile.isHit)
                     {
                         player.Health -= 10;
@@ -263,7 +277,19 @@ namespace TileBasedPlayer20172018
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            
+
+            spriteBatch.Begin();
+
+            if (sentryList.Count <= 0)
+            {
+                spriteBatch.Draw(endScreen, new Rectangle(0,0,endScreen.Width,endScreen.Height),Color.White);
+            }
+            spriteBatch.DrawString(sFont, 
+                "Time Remaining" + Math.Round(gameLimit - gameTime.TotalGameTime.Seconds).ToString(), 
+                new Vector2(20, 20),
+                Color.MonoGameOrange);
+
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
